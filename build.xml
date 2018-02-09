@@ -146,10 +146,32 @@
         <echo>Version: ${releaseVersion}</echo>
     </target>
 
-    <target name="dockerImageBuild" depends="prodVersion,createBuildDir,copyPlugins,createDockerImage" description="Copy result files to build dir">
+    <target name="dockerImageBuild" depends="prodVersion,createBuildDir,build,copyAndUnzipServerUpgradeBundle,copyServerUpgradeBundle,createDockerImage" description="Copy result files to build dir">
         <zip destfile="Build${fullVersion}/OSC-${releaseVersion}_Build${fullVersion}.zip">
             <fileset dir="Build${fullVersion}" includes="**/*.tar " />
         </zip>
+    </target>
+
+    <target name="checkServerUpgradeBundleExist">
+        <available file="docker/serverUpgradeBundle*.zip" property="isServerUpgradeBundleExist"/>
+    </target>
+
+    <target name="deleteOldServerUpgradeBundle" depends="checkServerUpgradeBundleExist" if="isServerUpgradeBundleExist">
+        <delete>
+            <fileset dir="docker/" includes="serverUpgradeBundle-*.zip" />
+        </delete>
+    </target>
+
+    <target name="copyAndUnzipServerUpgradeBundle" depends="deleteOldServerUpgradeBundle">
+        <copy file="target/serverUpgradeBundle.zip" tofile="docker/serverUpgradeBundle-${fullVersion}.zip" />
+            <exec executable="unzip" resultproperty="tar.result" dir="docker/">
+                <arg value="serverUpgradeBundle-${fullVersion}.zip" />
+            </exec>
+    </target>
+
+    <target name="clean" >
+        <delete file="docker/serverUpgradeBundle-${fullVersion}.zip"/>
+        <delete dir="docker/opt" />
     </target>
 
     <target name="createDockerImage" description="create docker image">
