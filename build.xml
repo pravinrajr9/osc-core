@@ -37,7 +37,7 @@
 	</target>
 
 	<target name="ovfOnly" depends="prodVersion" description="Runs ovfBuild and cleans up on error">
-		<waitfor maxwait="20" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
+		<waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
 			<not>
 				<available file="/tmp/build_marker" />
 			</not>
